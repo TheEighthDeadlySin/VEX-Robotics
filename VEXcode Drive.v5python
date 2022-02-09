@@ -1,0 +1,301 @@
+#region VEXcode Generated Robot Configuration
+from vex import *
+import urandom
+
+# Brain should be defined by default
+brain=Brain()
+
+# Robot configuration code
+controller_1 = Controller(PRIMARY)
+FrontLeft = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
+FrontRight = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)
+BackLeft = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
+BackRight = Motor(Ports.PORT10, GearSetting.RATIO_18_1, False)
+Lift1 = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)
+Lift2 = Motor(Ports.PORT14, GearSetting.RATIO_18_1, False)
+Clamp = Motor(Ports.PORT13, GearSetting.RATIO_18_1, False)
+
+
+# wait for rotation sensor to fully initialize
+wait(30, MSEC)
+
+
+
+
+
+
+#endregion VEXcode Generated Robot Configuration
+
+# ------------------------------------------
+# 
+# 	Project:      VEXcode Project
+#	Author:       VEX
+#	Created:
+#	Description:  VEXcode V5 Python Project
+# 
+# ------------------------------------------
+
+# Library imports
+from vex import *
+import math
+
+
+# Begin project code
+spd_mod = 1
+Lift1.set_velocity(40, PERCENT)
+Lift1.set_stopping(HOLD)
+Lift2.set_velocity(40, PERCENT)
+Lift2.set_stopping(HOLD)
+Clamp.set_velocity(100, PERCENT)
+Clamp.set_stopping(HOLD)
+wheels = [BackLeft,  FrontLeft, BackRight, FrontRight]
+for i in wheels:
+    i.set_stopping(HOLD)
+
+### Null Autonomous ###
+
+def autonomous():
+    pass
+
+### Left Autonomous ###
+
+# def autonomous():
+#     down = True
+#     up = False
+#     autonomousRotate(10/360, 100, True)
+#     autonomousLift(down, 10, False)
+#     autonomousMove(2, "u", 90, True)
+#     autonomousClamp(down, 180, True)
+#     autonomousLift(up, 10, False)
+#     autonomousRotate(10/360, -100, True)
+#     autonomousMove(2, "d", 90, True)
+#     autonomousRotate(0.5, -100, True)
+#     autonomousLift(down, 10, True)
+#     autonomousClamp(up, 50, True)
+#     #open the clamp
+
+### Right Autonomous ###
+
+# def autonomous():
+#     down = True
+#     up = False
+#     autonomousMove(2, "u", 90, True)
+#     #stop and close the clamp
+#     autonomousLift(up, 30, False)
+#     autonomousMove(2, "d", 90, False)
+#     autonomousRotate(0.5, -100, True)
+#     autonomousLift(down, 30, True)
+#     #stop and open the clamp
+#     autonomousRotate(0.75, 100, False)
+#     autonomousMove(1.5, "u", True)
+#     #stop and close clamp
+#     autonomousLift(up, 30, False)
+#     autonomousMove(1.5, "d", True)
+#     autonomousLift(down, 30, True)
+#     #stop and open clamp
+
+def autonomousLift(goDown, deg, halt):
+    ratio = 7
+    if goDown:
+        Lift1.spin_for(FORWARD, deg*ratio, DEGREES, wait=False)
+        Lift2.spin_for(REVERSE, deg*ratio, DEGREES, wait=halt)
+    else:
+        Lift1.spin_for(REVERSE, deg*ratio, DEGREES, wait=False)
+        Lift2.spin_for(FORWARD, deg*ratio, DEGREES, wait=halt)
+
+def autonomousClamp(goDown, deg, halt):
+    ratio = 5
+    if goDown == False:
+        Clamp.spin_for(REVERSE, deg*ratio, DEGREES, wait=halt)
+    else:
+        Clamp.spin_for(FORWARD, deg*ratio, DEGREES, wait=halt)
+
+def autonomousRotate(secs, velo, halt):
+    turn_constant = 1
+    global wheels
+    for i in wheels:
+        i.set_velocity(velo, PERCENT)
+    for i in wheels:
+        i.spin(FORWARD)
+    wait(secs, SECONDS)
+    if halt == True:
+        for i in wheels:
+            i.stop()
+
+def autonomousMove(secs, direction, velo, halt):
+    global wheels
+    if direction == "u":
+        UD = velo
+        RL = 0
+    elif direction == "ur":
+        UD = math.sin(45)*velo
+        RL = math.sin(45)*velo
+    elif direction == "r":
+        UD = 0
+        RL = velo
+    elif direction == "dr":
+        UD = -1*math.sin(45)*velo
+        RL = math.sin(45)*velo
+    elif direction == "d":
+        UD = -1*velo
+        RL = 0
+    elif direction == "dl":
+        UD = -1*math.sin(45)*velo
+        RL = -1*math.sin(45)*velo
+    elif direction == "l":
+        UD = 0
+        RL = -1*velo
+    elif direction == "ul":
+        UD = math.sin(45)*velo
+        RL = -1*math.sin(45)*velo
+
+    upRight, upLeft = getMoveVectors(RL, UD)
+    rotate_spd = 0
+    wheel_speeds = getMovement(upRight, upLeft, rotate_spd)
+    for i in range(len(wheel_speeds)):
+        wheel_speeds[i] = (wheel_speeds[i] / 71) * 100
+        if wheel_speeds[i] > 100:
+            wheel_speeds[i] = 100
+        elif wheel_speeds[i] < -100:
+            wheel_speeds[i] = -100
+    for i in wheels:
+        i.spin(FORWARD)
+    for i in range(4):
+        wheels[i].set_velocity(wheel_speeds[i], PERCENT)
+    wait(secs, SECONDS)
+    if halt == True:
+        for i in wheels:
+            i.stop()
+
+
+def rotate():
+    global spd_mod
+    rightJoyRL = controller_1.axis1.position()
+    spd = rightJoyRL*spd_mod
+    return spd
+
+def translate():
+    global spd_mod
+    leftJoyRL = controller_1.axis4.position()
+    leftJoyUD = controller_1.axis3.position()
+    upRight, upLeft = getMoveVectors(leftJoyRL, leftJoyUD)
+    upRight = upRight*spd_mod
+    upLeft = upLeft*spd_mod
+    return upRight, upLeft
+
+def calculateDeadzones(leftJoyRL, leftJoyUD):
+    deadzone_angle = 10
+    if leftJoyRL != leftJoyUD:
+        inputs = [abs(leftJoyRL), abs(leftJoyUD)]
+        input_angle = math.atan(min(inputs)/max(inputs))
+        if deadzone_angle > input_angle:
+            if inputs.index(max(inputs)) == 0:
+                leftJoyUD = 0
+            else:
+                leftJoyRL = 0                
+    return leftJoyRL, leftJoyUD
+
+def getMoveVectors(leftJoyRL, leftJoyUD):
+    x_axis = math.sqrt((leftJoyRL**2)/2)
+    y_axis = math.sqrt((leftJoyUD**2)/2)
+    if leftJoyRL >= 0 and leftJoyUD >= 0:
+        upRight = x_axis + y_axis
+        upLeft = y_axis - x_axis
+    elif leftJoyRL <= 0 and leftJoyUD >= 0:
+        upRight = y_axis - x_axis
+        upLeft = y_axis + x_axis
+    elif leftJoyRL <= 0 and leftJoyUD <= 0:
+        upRight = 0 - x_axis - y_axis
+        upLeft = x_axis - y_axis
+    elif leftJoyRL >= 0 and leftJoyUD <= 0:
+        upRight = x_axis - y_axis
+        upLeft = 0 - y_axis - x_axis    
+    return upRight, upLeft
+
+def move():
+    FrontLeft.set_stopping(HOLD)
+    FrontRight.set_stopping(HOLD)
+    BackLeft.set_stopping(HOLD)
+    BackRight.set_stopping(HOLD)
+    upRight, upLeft = translate()
+    rotate_spd = rotate()
+    wheel_speeds = getMovement(upRight, upLeft, rotate_spd)
+    all_stopped = False
+    for i in wheel_speeds:
+        if i < 1 and i > -1:
+            all_stopped = True
+    for i in range(len(wheel_speeds)):
+        wheel_speeds[i] = (wheel_speeds[i] / 71) * 100
+        if wheel_speeds[i] > 100:
+            wheel_speeds[i] = 100
+        if wheel_speeds[i] < -100:
+            wheel_speeds[i] = -100
+    if all_stopped == False:
+        for i in range(4):
+            wheels[i].set_velocity(wheel_speeds[i], PERCENT)
+        for i in wheels:
+            i.spin(FORWARD)
+    else:
+        FrontLeft.stop()
+        FrontRight.stop()
+        BackLeft.stop()
+        BackRight.stop()
+        for i in wheels:
+            i.stop()
+
+def liftDown():
+    Lift1.spin(FORWARD)
+    Lift2.spin(REVERSE)
+
+def liftStop():
+    Lift1.stop()
+    Lift2.stop()
+
+def liftUp():
+    Lift1.spin(REVERSE) 
+    Lift2.spin(FORWARD)
+
+def getMovement(upRight, upLeft, rotate_spd):
+    bl = upLeft + rotate_spd
+    fl = upRight + rotate_spd
+    br = rotate_spd - upRight
+    fr = rotate_spd - upLeft
+    wheel_speeds = [bl, fl ,br, fr]
+    return wheel_speeds
+
+def slowToggle():
+    global spd_mod
+    if spd_mod == 1:
+        spd_mod = 0.3
+    else:
+        spd_mod = 1
+
+def clampDown():
+    Clamp.spin(FORWARD)
+
+def clampStop():
+    Clamp.stop()
+
+def clampUp():
+    Clamp.spin(REVERSE)
+
+# def l2Relesed():
+#     global spd_mod
+#     spd_mod = 1
+#     move()
+
+def driver_control():
+    controller_1.axis1.changed(move)
+    controller_1.axis3.changed(move)
+    controller_1.axis4.changed(move)
+    controller_1.buttonL1.pressed(slowToggle)
+    controller_1.buttonR1.pressed(liftUp)
+    controller_1.buttonR2.pressed(liftDown)
+    controller_1.buttonR1.released(liftStop)
+    controller_1.buttonR2.released(liftStop)
+    controller_1.buttonDown.pressed(clampDown)
+    controller_1.buttonUp.pressed(clampUp)
+    controller_1.buttonDown.released(clampStop)
+    controller_1.buttonUp.released(clampStop)
+    
+competition = Competition(driver_control, autonomous)
