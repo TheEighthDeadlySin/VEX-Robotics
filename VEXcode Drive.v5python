@@ -55,43 +55,45 @@ for i in wheels:
 
 def autonomous():
     pass
+    # leftAutonomous()
+    # rightAutonomous()
 
 ### Left Autonomous ###
 
-# def autonomous():
-#     down = True
-#     up = False
-#     autonomousRotate(10/360, 100, True)
-#     autonomousLift(down, 10, False)
-#     autonomousMove(2, "u", 90, True)
-#     autonomousClamp(down, 180, True)
-#     autonomousLift(up, 10, False)
-#     autonomousRotate(10/360, -100, True)
-#     autonomousMove(2, "d", 90, True)
-#     autonomousRotate(0.5, -100, True)
-#     autonomousLift(down, 10, True)
-#     autonomousClamp(up, 50, True)
-#     #open the clamp
+def leftAutonomous():
+    down = True
+    up = False
+    autonomousRotate(10/360, 100, True)
+    autonomousLift(down, 10, False)
+    autonomousMove(2, "u", 90, True)
+    autonomousClamp(down, 180, True)
+    autonomousLift(up, 10, False)
+    autonomousRotate(10/360, -100, True)
+    autonomousMove(2, "d", 90, True)
+    autonomousRotate(0.5, -100, True)
+    autonomousLift(down, 10, True)
+    autonomousClamp(up, 50, True)
+    #open the clamp
 
 ### Right Autonomous ###
 
-# def autonomous():
-#     down = True
-#     up = False
-#     autonomousMove(2, "u", 90, True)
-#     #stop and close the clamp
-#     autonomousLift(up, 30, False)
-#     autonomousMove(2, "d", 90, False)
-#     autonomousRotate(0.5, -100, True)
-#     autonomousLift(down, 30, True)
-#     #stop and open the clamp
-#     autonomousRotate(0.75, 100, False)
-#     autonomousMove(1.5, "u", True)
-#     #stop and close clamp
-#     autonomousLift(up, 30, False)
-#     autonomousMove(1.5, "d", True)
-#     autonomousLift(down, 30, True)
-#     #stop and open clamp
+def rightAutonomous():
+    down = True
+    up = False
+    autonomousMove(2, "u", 90, True)
+    #stop and close the clamp
+    autonomousLift(up, 30, False)
+    autonomousMove(2, "d", 90, False)
+    autonomousRotate(0.5, -100, True)
+    autonomousLift(down, 30, True)
+    #stop and open the clamp
+    autonomousRotate(0.75, 100, False)
+    autonomousMove(1.5, "u", True)
+    #stop and close clamp
+    autonomousLift(up, 30, False)
+    autonomousMove(1.5, "d", True)
+    autonomousLift(down, 30, True)
+    #stop and open clamp
 
 def autonomousLift(goDown, deg, halt):
     ratio = 7
