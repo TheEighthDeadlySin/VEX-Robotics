@@ -51,12 +51,20 @@ wheels = [BackLeft,  FrontLeft, BackRight, FrontRight]
 for i in wheels:
     i.set_stopping(HOLD)
 
-### Null Autonomous ###
+### Autonomous ###
 
 def autonomous():
-    pass
+    # pass
     # leftAutonomous()
     # rightAutonomous()
+    testAutonomous()
+    
+def testAutonomous():
+    testMove(3)
+    testRotate(360)
+    testMove(1)
+    testRotate(180)
+    testMove(4)
 
 ### Left Autonomous ###
 
@@ -123,6 +131,38 @@ def autonomousRotate(secs, velo, halt):
         for i in wheels:
             i.stop()
 
+def testMove(secs):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    backLeft.spin(FORWARD)
+    backRight.spin(BACKWARD)
+    frontLeft.spin(FORWARD)
+    frontRight.spin(BACKWARD)
+    wait(secs, SECONDS)
+    backLeft.stop()
+    backRight.stop()
+    frontLeft.stop()
+    frontRight.stop()
+    
+def testRotate(degrees, clockwise):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    if clockwise:
+        backLeft.spin(FORWARD)
+        backRight.spin(FORWARD)
+        frontLeft.spin(FORWARD)
+        frontRight.spin(FORWARD)
+    else:
+        backLeft.spin(BACKWARD)
+        backRight.spin(BACKWARD)
+        frontLeft.spin(BACKWARD)
+        frontRight.spin(BACKWARD)
+    wait((degrees / 100), SECONDS)
+    backLeft.stop()
+    backRight.stop()
+    frontLeft.stop()
+    frontRight.stop()
+    
 def autonomousMove(secs, direction, velo, halt):
     global wheels
     if direction == "u":
@@ -159,10 +199,10 @@ def autonomousMove(secs, direction, velo, halt):
             wheel_speeds[i] = 100
         elif wheel_speeds[i] < -100:
             wheel_speeds[i] = -100
-    for i in wheels:
-        i.spin(FORWARD)
     for i in range(4):
         wheels[i].set_velocity(wheel_speeds[i], PERCENT)
+    for i in wheels:
+        i.spin(FORWARD)
     wait(secs, SECONDS)
     if halt == True:
         for i in wheels:
