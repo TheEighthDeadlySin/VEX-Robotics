@@ -60,11 +60,68 @@ def autonomous():
     testAutonomous()
     
 def testAutonomous():
-    testMove(3)
-    testRotate(360)
+    testMove(2)
+    testRotate(360, True)
     testMove(1)
-    testRotate(180)
-    testMove(4)
+    testRotate(180, False)
+    testMove(3)
+    testForklift(True)
+    testForklift(False)
+    testClamp(True)
+
+def testMove(secs):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    BackLeft.spin(FORWARD)
+    BackRight.spin(REVERSE)
+    FrontLeft.spin(FORWARD)
+    FrontRight.spin(REVERSE)
+    wait(secs, SECONDS)
+    BackLeft.stop()
+    BackRight.stop()
+    FrontLeft.stop()
+    FrontRight.stop()
+    
+def testRotate(degrees, clockwise):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    if clockwise:
+        BackLeft.spin(FORWARD)
+        BackRight.spin(FORWARD)
+        FrontLeft.spin(FORWARD)
+        FrontRight.spin(FORWARD)
+    else:
+        BackLeft.spin(REVERSE)
+        BackRight.spin(REVERSE)
+        FrontLeft.spin(REVERSE)
+        FrontRight.spin(REVERSE)
+    wait((degrees / 200), SECONDS)
+    BackLeft.stop()
+    BackRight.stop()
+    FrontLeft.stop()
+    FrontRight.stop()
+
+def testForklift(up):
+    Lift1.set_velocity(70, PERCENT)
+    Lift2.set_velocity(70, PERCENT)
+    if up:
+        Lift1.spin(FORWARD)
+        Lift2.spin(REVERSE)
+    else:
+        Lift1.spin(REVERSE)
+        Lift2.spin(FORWARD)
+    wait(1, SECONDS)
+    Lift1.stop()
+    Lift2.stop()
+
+def testClamp(up):
+    Clamp.set_velocity(50, PERCENT)
+    if up:
+        Clamp.spin(FORWARD)
+    else:
+        Clamp.spin(REVERSE)
+    wait(1, SECONDS)
+    Clamp.stop()
 
 ### Left Autonomous ###
 
