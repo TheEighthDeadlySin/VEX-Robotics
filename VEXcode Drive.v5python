@@ -45,53 +45,148 @@ Lift1.set_velocity(40, PERCENT)
 Lift1.set_stopping(HOLD)
 Lift2.set_velocity(40, PERCENT)
 Lift2.set_stopping(HOLD)
-Clamp.set_velocity(100, PERCENT)
-Clamp.set_stopping(HOLD)
+Clamp1.set_velocity(100, PERCENT)
+Clamp1.set_stopping(HOLD)
+Clamp2.set_velocity(100, PERCENT)
+Clamp2.set_stopping(HOLD)
 wheels = [BackLeft,  FrontLeft, BackRight, FrontRight]
 for i in wheels:
     i.set_stopping(HOLD)
 
-### Null Autonomous ###
+### Autonomous ###
 
 def autonomous():
-    pass
+    # pass
+    # leftAutonomous()
+    # rightAutonomous()
+    testLeftAutonomous()
+    testRightAutonomous()
+    
+def testLeftAutonomous(): # Left autonomous
+    testMove(2)
+    testClamp(True, True)
+    testMove(2, False)
+    testForklift(True)
+    testRotate(90, False)
+    testMove(1, False)
+    testClamp(True, False)
+    testMove(1)
+    testRotate(90, True)
+
+def testRightAutonomous(): #Right autonomous
+    testMove(2)
+    testClamp(True, True)
+    testRotate(170, True)
+    testMove(1, False)
+    testClamp(True, False)
+    testMove(1)
+    testRotate(170, False)
+    testMove(2)
+
+def testMove(secs, forwards=True):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    if forwards:
+        BackLeft.spin(FORWARD)
+        BackRight.spin(REVERSE)
+        FrontLeft.spin(FORWARD)
+        FrontRight.spin(REVERSE)
+    else:
+        BackLeft.spin(REVERSE)
+        BackRight.spin(FORWARD)
+        FrontLeft.spin(REVERSE)
+        FrontRight.spin(FORWARD)
+    wait(secs, SECONDS)
+    BackLeft.stop()
+    BackRight.stop()
+    FrontLeft.stop()
+    FrontRight.stop()
+    
+def testRotate(degrees, clockwise):
+    for i in wheels:
+        i.set_velocity(50, PERCENT)
+    if clockwise:
+        BackLeft.spin(FORWARD)
+        BackRight.spin(FORWARD)
+        FrontLeft.spin(FORWARD)
+        FrontRight.spin(FORWARD)
+    else:
+        BackLeft.spin(REVERSE)
+        BackRight.spin(REVERSE)
+        FrontLeft.spin(REVERSE)
+        FrontRight.spin(REVERSE)
+    wait((degrees / 195), SECONDS)
+    BackLeft.stop()
+    BackRight.stop()
+    FrontLeft.stop()
+    FrontRight.stop()
+
+def testForklift(up):
+    Lift1.set_velocity(70, PERCENT)
+    Lift2.set_velocity(70, PERCENT)
+    if up:
+        Lift1.spin(REVERSE)
+        Lift2.spin(FORWARD)
+    else:
+        Lift1.spin(FORWARD)
+        Lift2.spin(REVERSE)
+    wait(2, SECONDS)
+    Lift1.stop()
+    Lift2.stop()
+
+def testClamp(up, forklift):
+    if forklift:
+        if up:
+            Clamp1.spin(REVERSE)
+        else:
+            Clamp1.spin(FORWARD)
+        wait(1, SECONDS)
+        Clamp1.stop()
+    else:
+        if up:
+            Clamp2.spin(REVERSE)
+        else:
+            Clamp2.spin(FORWARD)
+        wait(1, SECONDS)
+        Clamp2.stop()
+
 
 ### Left Autonomous ###
 
-# def autonomous():
-#     down = True
-#     up = False
-#     autonomousRotate(10/360, 100, True)
-#     autonomousLift(down, 10, False)
-#     autonomousMove(2, "u", 90, True)
-#     autonomousClamp(down, 180, True)
-#     autonomousLift(up, 10, False)
-#     autonomousRotate(10/360, -100, True)
-#     autonomousMove(2, "d", 90, True)
-#     autonomousRotate(0.5, -100, True)
-#     autonomousLift(down, 10, True)
-#     autonomousClamp(up, 50, True)
-#     #open the clamp
+def leftAutonomous():
+    down = True
+    up = False
+    autonomousRotate(10/360, 100, True)
+    autonomousLift(down, 10, False)
+    autonomousMove(2, "u", 90, True)
+    autonomousClamp(down, 180, True)
+    autonomousLift(up, 10, False)
+    autonomousRotate(10/360, -100, True)
+    autonomousMove(2, "d", 90, True)
+    autonomousRotate(0.5, -100, True)
+    autonomousLift(down, 10, True)
+    autonomousClamp(up, 50, True)
+    #open the clamp
 
 ### Right Autonomous ###
 
-# def autonomous():
-#     down = True
-#     up = False
-#     autonomousMove(2, "u", 90, True)
-#     #stop and close the clamp
-#     autonomousLift(up, 30, False)
-#     autonomousMove(2, "d", 90, False)
-#     autonomousRotate(0.5, -100, True)
-#     autonomousLift(down, 30, True)
-#     #stop and open the clamp
-#     autonomousRotate(0.75, 100, False)
-#     autonomousMove(1.5, "u", True)
-#     #stop and close clamp
-#     autonomousLift(up, 30, False)
-#     autonomousMove(1.5, "d", True)
-#     autonomousLift(down, 30, True)
-#     #stop and open clamp
+def rightAutonomous():
+    down = True
+    up = False
+    autonomousMove(2, "u", 90, True)
+    #stop and close the clamp
+    autonomousLift(up, 30, False)
+    autonomousMove(2, "d", 90, False)
+    autonomousRotate(0.5, -100, True)
+    autonomousLift(down, 30, True)
+    #stop and open the clamp
+    autonomousRotate(0.75, 100, False)
+    autonomousMove(1.5, "u", 90, True)
+    #stop and close clamp
+    autonomousLift(up, 30, False)
+    autonomousMove(1.5, "d", 90, True)
+    autonomousLift(down, 30, True)
+    #stop and open clamp
 
 def autonomousLift(goDown, deg, halt):
     ratio = 7
@@ -105,9 +200,9 @@ def autonomousLift(goDown, deg, halt):
 def autonomousClamp(goDown, deg, halt):
     ratio = 5
     if goDown == False:
-        Clamp.spin_for(REVERSE, deg*ratio, DEGREES, wait=halt)
+        Clamp1.spin_for(REVERSE, deg*ratio, DEGREES, wait=halt)
     else:
-        Clamp.spin_for(FORWARD, deg*ratio, DEGREES, wait=halt)
+        Clamp1.spin_for(FORWARD, deg*ratio, DEGREES, wait=halt)
 
 def autonomousRotate(secs, velo, halt):
     turn_constant = 1
@@ -120,7 +215,7 @@ def autonomousRotate(secs, velo, halt):
     if halt == True:
         for i in wheels:
             i.stop()
-
+    
 def autonomousMove(secs, direction, velo, halt):
     global wheels
     if direction == "u":
@@ -157,10 +252,10 @@ def autonomousMove(secs, direction, velo, halt):
             wheel_speeds[i] = 100
         elif wheel_speeds[i] < -100:
             wheel_speeds[i] = -100
-    for i in wheels:
-        i.spin(FORWARD)
     for i in range(4):
         wheels[i].set_velocity(wheel_speeds[i], PERCENT)
+    for i in wheels:
+        i.spin(FORWARD)
     wait(secs, SECONDS)
     if halt == True:
         for i in wheels:
@@ -269,14 +364,23 @@ def slowToggle():
     else:
         spd_mod = 1
 
-def clampDown():
-    Clamp.spin(FORWARD)
+def clamp1Down():
+    Clamp1.spin(FORWARD)
 
-def clampStop():
-    Clamp.stop()
+def clamp1Up():
+    Clamp1.spin(REVERSE)
 
-def clampUp():
-    Clamp.spin(REVERSE)
+def clamp1Stop():
+    Clamp1.stop()
+
+def clamp2Down():
+    Clamp2.spin(FORWARD)
+
+def clamp2Up():
+    Clamp2.spin(REVERSE)
+
+def clamp2Stop():
+    Clamp2.stop()
 
 # def l2Relesed():
 #     global spd_mod
@@ -292,9 +396,13 @@ def driver_control():
     controller_1.buttonR2.pressed(liftDown)
     controller_1.buttonR1.released(liftStop)
     controller_1.buttonR2.released(liftStop)
-    controller_1.buttonDown.pressed(clampDown)
-    controller_1.buttonUp.pressed(clampUp)
-    controller_1.buttonDown.released(clampStop)
-    controller_1.buttonUp.released(clampStop)
+    controller_1.buttonDown.pressed(clamp1Down)
+    controller_1.buttonUp.pressed(clamp1Up)
+    controller_1.buttonDown.released(clamp1Stop)
+    controller_1.buttonUp.released(clamp1Stop)
+    controller_1.buttonLeft.pressed(clamp2Up)
+    controller_1.buttonRight.pressed(clamp2Down)
+    controller_1.buttonLeft.released(clamp2Stop)
+    controller_1.buttonRight.released(clamp2Stop)
     
 competition = Competition(driver_control, autonomous)
